@@ -25,3 +25,9 @@ Stops the helper
 
 #### //lazy reload
 Reloads the options from the settings.xml
+
+### settings.xml
+<spell></spell> - Spell to cast, will cast whenever MP and recast time allows
+<spell_active></spell_active> - true/false enables/disables enables casting of the spell
+<weaponskill></weaponskill> - weaponskill to use when over 1000TP
+<weaponskill_active></weaponskill_active> - true/false enables/disables use of weaponskills
