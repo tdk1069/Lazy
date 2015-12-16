@@ -59,8 +59,6 @@ windower.register_event('addon command', function (...)
 		windower.add_to_chat(2,"Stopping Lazy Helper....")
 		Start_Engine = false
 	elseif args[1] == "save" then
-		settings.spell = "Fire II"
-		settings.weaponskill = "Myrkr"
 		config.save(settings,windower.ffxi.get_player().name)
 	elseif args[1] == "test" then
 		test()
