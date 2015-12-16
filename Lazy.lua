@@ -52,11 +52,11 @@ windower.register_event('addon command', function (...)
 	if args[1] == nil or args[1] == "help" then
 		print("Help Info")
 	elseif args[1] == "start" then
-		windower.add_to_chat(2,"Starting Luvly Healer....")
+		windower.add_to_chat(2,"Starting Lazy Helper....")
 		Start_Engine = true
 		Engine()
 	elseif args[1] == "stop" then
-		windower.add_to_chat(2,"Stopping Luvly Healer....")
+		windower.add_to_chat(2,"Stopping Lazy Helper....")
 		Start_Engine = false
 	elseif args[1] == "save" then
 		settings.spell = "Fire II"
