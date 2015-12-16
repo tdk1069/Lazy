@@ -82,6 +82,23 @@ function TurnToTarget()
 	end
 end
 
+function Find_Nearest_Target(target)
+	local id_targ = -1
+	local dist_targ = -1
+	for key,mob in pairs(marray) do
+		if mob["name"] == target and mob["valid_target"] then
+			if dist_targ == -1 then
+				id_targ = key
+				dist_targ = math.sqrt(mob["distance"])
+			elseif math.sqrt(mob["distance"]) < dist_targ then
+				id_targ = key
+				dist_targ = math.sqrt(mob["distance"])
+			end
+		end
+	end
+	return(id_targ)
+end
+
 function Check_Distance()
 	local distance = windower.ffxi.get_mob_by_target('t').distance:sqrt()
 	if distance > settings.combat_range then
