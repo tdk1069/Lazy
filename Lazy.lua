@@ -23,6 +23,7 @@ defaults.spell = ""
 defaults.spell_active = false
 defaults.weaponskill = ""
 defaults.weaponskill_active = false
+defaults.combat_range = 3
 
 settings = config.load(defaults)
 
@@ -83,7 +84,7 @@ end
 
 function Check_Distance()
 	local distance = windower.ffxi.get_mob_by_target('t').distance:sqrt()
-	if distance > 3 then
+	if distance > settings.combat_range then
 		TurnToTarget()
 		windower.ffxi.run()
 	else
