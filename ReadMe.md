@@ -6,6 +6,7 @@ Simple helper for farming XP/CP/Trash items. So far includes:
   - Keep within 3Yalms of Target at all times
   - Weaponskill when TP available
   - Ability to cast a spell whenever Recast/MP allows
+  - _SIMPLE_ auto target system
 
 ### Installation
 
