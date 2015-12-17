@@ -7,7 +7,7 @@ packets = require('packets')
 
 _addon.name = 'lazy'
 _addon.author = 'Brax'
-_addon.version = '0.1'
+_addon.version = '0.5'
 _addon.commands = {'lazy'}
 
 Start_Engine = true
@@ -23,7 +23,8 @@ defaults.spell = ""
 defaults.spell_active = false
 defaults.weaponskill = ""
 defaults.weaponskill_active = false
-defaults.combat_range = 3
+defaults.autotarget = false
+defaults.target = ""
 
 settings = config.load(defaults)
 
@@ -39,13 +40,14 @@ windower.register_event('incoming chunk', function(id, data)
 				isBusy = Action_Delay
 			end
 		end
-    end
+	end
 end)
+
 windower.register_event('outgoing chunk', function(id, data)
     if id == 0x015 then
         local action_message = packets.parse('outgoing', data)
 		PlayerH = action_message["Rotation"]
-    end
+	end
 end)
 
 windower.register_event('addon command', function (...)
@@ -53,16 +55,36 @@ windower.register_event('addon command', function (...)
 	if args[1] == nil or args[1] == "help" then
 		print("Help Info")
 	elseif args[1] == "start" then
-		windower.add_to_chat(2,"Starting Lazy Helper....")
+		windower.add_to_chat(2,"....Starting Lazy Helper....")
 		Start_Engine = true
 		Engine()
 	elseif args[1] == "stop" then
-		windower.add_to_chat(2,"Stopping Lazy Helper....")
+		windower.add_to_chat(2,"....Stopping Lazy Helper....")
 		Start_Engine = false
+	elseif args[1] == "reload" then
+		windower.add_to_chat(2,"....Reloading Config....")
+		config.reload(settings)
 	elseif args[1] == "save" then
 		config.save(settings,windower.ffxi.get_player().name)
 	elseif args[1] == "test" then
 		test()
+	elseif args[1] == "show" then
+		windower.add_to_chat(11,"Autotarget: "..tostring(settings.autotarget))
+		windower.add_to_chat(11,"Spell: "..settings.spell)
+		windower.add_to_chat(11,"Use Spell "..tostring(settings.spell_active))
+		windower.add_to_chat(11,"Weaponskill: "..settings.weaponskill)
+		windower.add_to_chat(11,"Use Weaponskill: "..tostring(settings.weaponskill_active))
+		windower.add_to_chat(11,"Target:"..settings.target)
+	elseif args[1] == "autotarget" then
+		if args[2] == "on" then
+			settings.autotarget = true
+			windower.add_to_chat(3,"Autotarget: True")
+		else
+			settings.autotarget = false
+			windower.add_to_chat(3,"Autotarget: False")
+		end
+	elseif args[1] == "target" then
+		settings.target = args[2]
 	end
 end)
 
@@ -85,8 +107,9 @@ end
 function Find_Nearest_Target(target)
 	local id_targ = -1
 	local dist_targ = -1
+	local marray = windower.ffxi.get_mob_array()
 	for key,mob in pairs(marray) do
-		if mob["name"] == target and mob["valid_target"] then
+		if string.lower(mob["name"]) == string.lower(target) and mob["valid_target"] and mob["hpp"] == 100 then
 			if dist_targ == -1 then
 				id_targ = key
 				dist_targ = math.sqrt(mob["distance"])
@@ -101,7 +124,7 @@ end
 
 function Check_Distance()
 	local distance = windower.ffxi.get_mob_by_target('t').distance:sqrt()
-	if distance > settings.combat_range then
+	if distance > 3 then
 		TurnToTarget()
 		windower.ffxi.run()
 	else
@@ -110,7 +133,6 @@ function Check_Distance()
 end
 
 function test()
-print(settings.weaponskill_active)
 end
 
 function Engine()
@@ -130,12 +152,21 @@ end
 function Combat()
 	-- is Engaged / combat
 	if windower.ffxi.get_player().status == 1 then
-	TurnToTarget()
-	Check_Distance()
-		if windower.ffxi.get_player().vitals.tp >1000 and settings.weaponskill_active == true then
+		TurnToTarget()
+		Check_Distance()
+		if windower.ffxi.get_player().vitals.tp >1000 and settings.weaponskill_active == true and windower.ffxi.get_mob_by_target('t').distance:sqrt() < 3.0 then
 			windower.send_command(settings.weaponskill)
+			isBusy = Action_Delay
 		elseif Can_Cast_Spell(settings.spell) and settings.spell_active == true then
 			Cast_Spell(settings.spell)
+		end
+	elseif settings.autotarget == true then
+		if Find_Nearest_Target(settings.target) > 0 then
+			windower.ffxi.follow(Find_Nearest_Target(settings.target))
+			if math.sqrt(windower.ffxi.get_mob_by_index(Find_Nearest_Target(settings.target)).distance) < 3 then
+				windower.send_command("input /targetbnpc")
+				windower.send_command("input /attack on")
+			end
 		end
 	end
 end
