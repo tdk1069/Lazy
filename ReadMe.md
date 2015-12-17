@@ -26,14 +26,21 @@ Stops the helper
 #### //lazy reload
 Reloads the options from the settings.xml
 
+#### //lazy target "Some Monster"
+Sets/Changes the current auto target monster, Single mob only for now
+
 ### settings.xml
 ```xml
 <spell></spell>
 <spell_active></spell_active>
 <weaponskill></weaponskill>
 <weaponskill_active></weaponskill_active>
+<autotarget>false</autotarget>
+<target>Monster Name<target>
 ```
 * spell - Spell to cast, will cast whenever MP and recast time allows
 * spell_active - true/false enables/disables enables casting of the spell
 * weaponskill - weaponskill to use when over 1000TP
 * weaponskill_active - true/false enables/disables use of weaponskills
+* autotarget - true/false enables/disables automatic hunting of mobs in range
+* target - name of monster to hunt
