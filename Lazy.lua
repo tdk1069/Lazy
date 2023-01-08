@@ -138,9 +138,9 @@ end
 function Engine()
 	Buffs = windower.ffxi.get_player()["buffs"]
     table.reassign(buffactive,convert_buff_list(Buffs))
-	
+
 	if isBusy < 1 then
-		Combat()
+		pcall(Combat)
 	else
 		isBusy = isBusy -1
 	end
@@ -221,7 +221,7 @@ function convert_buff_list(bufflist)
             else
                 buffarr[buff] = 1
             end
-            
+
             if buffarr[v] then
                 buffarr[v] = buffarr[v] +1
             else
