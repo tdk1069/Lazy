@@ -1,5 +1,3 @@
-Unfortunately I no longer play and haven't for years so am unable to fix issues or update. I will leave the code here public incase anyone wishes to take over 
-
 # Lazy
 
 Simple helper for farming XP/CP/Trash items. So far includes:
