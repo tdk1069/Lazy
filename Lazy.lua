@@ -6,8 +6,8 @@ res = require('resources')
 packets = require('packets')
 
 _addon.name = 'lazy'
-_addon.author = 'Brax'
-_addon.version = '0.5'
+_addon.author = 'Brax, patched by ShriveledSquirrel'
+_addon.version = '0.6'
 _addon.commands = {'lazy'}
 
 Start_Engine = true
@@ -15,6 +15,7 @@ isCasting = false
 isBusy = 0
 buffactive = {}
 Action_Delay = 2
+ERROR_LEVEL = 0
 
 buffactive = {}
 
@@ -53,7 +54,7 @@ end)
 windower.register_event('addon command', function (...)
 	local args	= T{...}:map(string.lower)
 	if args[1] == nil or args[1] == "help" then
-		print("Help Info")
+		print("Commands: start, stop, reload, save, show, autotarget, target")
 	elseif args[1] == "start" then
 		windower.add_to_chat(2,"....Starting Lazy Helper....")
 		Start_Engine = true
@@ -65,9 +66,8 @@ windower.register_event('addon command', function (...)
 		windower.add_to_chat(2,"....Reloading Config....")
 		config.reload(settings)
 	elseif args[1] == "save" then
+		windower.add_to_chat(2,"....Saving Config....")
 		config.save(settings,windower.ffxi.get_player().name)
-	elseif args[1] == "test" then
-		test()
 	elseif args[1] == "show" then
 		windower.add_to_chat(11,"Autotarget: "..tostring(settings.autotarget))
 		windower.add_to_chat(11,"Spell: "..settings.spell)
@@ -132,13 +132,10 @@ function Check_Distance()
 	end
 end
 
-function test()
-end
-
 function Engine()
 	Buffs = windower.ffxi.get_player()["buffs"]
     table.reassign(buffactive,convert_buff_list(Buffs))
-
+	
 	if isBusy < 1 then
 		pcall(Combat)
 	else
@@ -221,7 +218,7 @@ function convert_buff_list(bufflist)
             else
                 buffarr[buff] = 1
             end
-
+            
             if buffarr[v] then
                 buffarr[v] = buffarr[v] +1
             else
@@ -231,3 +228,33 @@ function convert_buff_list(bufflist)
     end
     return buffarr
 end
+
+function bug_smasher(original)
+	incoming_text = original
+	player_name = windower.ffxi.get_player()["name"]
+	out_of_range = "is out of range."
+	unable_to_see = "Unable to see the"
+	monster_slain = (player_name .. " defeats the")
+	
+	if (string.find(incoming_text, out_of_range))
+	or (string.find(incoming_text, unable_to_see)) then
+		ERROR_LEVEL = (ERROR_LEVEL + 1)
+	elseif (string.find(incoming_text, monster_slain)) then
+		ERROR_LEVEL = 0
+	end
+	
+	if (ERROR_LEVEL >= 3)
+	and (ERROR_LEVEL < 6 ) then
+		target_lock_checker = windower.ffxi.get_player()["target_locked"]
+		if (target_lock_checker == false) then
+			windower.send_command("input /lockon")
+		end
+	elseif (ERROR_LEVEL == 6) then
+		windower.send_command("setkey s down; wait 3.0; setkey s up")
+	elseif (ERROR_LEVEL == 12) then
+		windower.send_command("input /attack")
+	end
+	
+end
+
+windower.register_event("incoming text", bug_smasher)
