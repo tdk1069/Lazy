@@ -236,24 +236,28 @@ function bug_smasher(original)
 	unable_to_see = "Unable to see the"
 	monster_slain = (player_name .. " defeats the")
 	
-	if (string.find(incoming_text, out_of_range))
-	or (string.find(incoming_text, unable_to_see)) then
-		ERROR_LEVEL = (ERROR_LEVEL + 1)
-	elseif (string.find(incoming_text, monster_slain)) then
-		ERROR_LEVEL = 0
-	end
-	
-	if (ERROR_LEVEL >= 3)
-	and (ERROR_LEVEL < 6 ) then
-		target_lock_checker = windower.ffxi.get_player()["target_locked"]
-		if (target_lock_checker == false) then
-			windower.send_command("input /lockon")
+	if (Start_Engine == true) then
+		if (string.find(incoming_text, out_of_range))
+		or (string.find(incoming_text, unable_to_see)) then
+			ERROR_LEVEL = (ERROR_LEVEL + 1)
+		elseif (string.find(incoming_text, monster_slain)) then
+			ERROR_LEVEL = 0
 		end
-	elseif (ERROR_LEVEL == 6) then
-		windower.send_command("setkey s down; wait 3.0; setkey s up")
-	elseif (ERROR_LEVEL == 12) then
-		windower.send_command("input /attack")
+	
+		if (ERROR_LEVEL == 3) then
+			target_lock_checker = windower.ffxi.get_player()["target_locked"]
+			if (target_lock_checker == false) then
+				windower.send_command("input /lockon")
+			end
+		elseif (ERROR_LEVEL == 6) then
+			windower.send_command("setkey s down; wait 3.0; setkey s up")
+		elseif (ERROR_LEVEL == 12) then
+			windower.send_command("input /attack")
+		elseif (ERROR_LEVEL == 20) then
+			windower.send_command("input /p <call1>")
+		end
 	end
+	--print("ERROR LEVEL: " .. ERROR_LEVEL)
 	
 end
 
